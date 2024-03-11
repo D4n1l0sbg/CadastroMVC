@@ -67,15 +67,20 @@ export abstract class GenericDAO<T, K> {
         ));
     }
     constructor(){
-        db.transaction((txn)=>
-            txn.executeSql(
-                ' SELECT name FROM sqlite_master WHERE type='table' '+
-        ' AND name = ? ',
-            [this.getTableName()],(txn,results)=>{
-            if(results.rows.length==0)
-                db.transaction((txn)=>
-                    txn.executeSql(this.getCreateSQL(),[])
-                );
-        }));
+        db.transaction(
+            (txn) => txn.executeSql(
+                'SELECT name FROM sqlite_master WHERE type= table',
+                'AND name= ?',
+                [this.getTableName()],
+                (txn, results) => {
+                    if (results.rows.length == 0)
+                        db.transaction(
+                            (txn) => txn.executeSql(
+                                this.getCreateSQL(),[]
+                            )
+                        )
+                }
+            )
+        )
     }
 }
